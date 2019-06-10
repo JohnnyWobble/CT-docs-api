@@ -4,12 +4,9 @@ import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from setup import setup
 
-# If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/documents.readonly']
 
-# The ID of a sample document.
-DOCUMENT_ID = '1Ldr5XG-b8u63CZBOUpQhQloNAwFfsb9DlvJlSOMDJqU'
 
 
 def log(string):
@@ -17,36 +14,62 @@ def log(string):
         f.write(string)
 
 
+def even(number):
+
+  return any([number == i for i in [2, 4, 6, 8, 10, 12]])
+
+
+
+def test():
+  testy = {'a': 23, 'b': 45}
+  print(testy)
+  testy.update({'a':45})
+  print(testy)
+
+# test()
+
+
+
+
+def find_str(test_str, str_to_find):
+  counter = 0
+  for i in test_str:
+    if i == str_to_find:
+      counter +=1
+  return counter
+
+
+def replace_string(string, find_string, replace_with):
+  return_string = ""
+  for i in string:
+    if i == find_string:
+      return_string += replace_with
+      continue
+    return_string += i
+  return return_string
+
+
 def main():
-    """Shows basic usage of the Docs API.
-    Prints the title of a sample document.
-    """
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server()
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('docs', 'v1', credentials=creds)
-
-    # Retrieve the documents contents from the Docs service.
-    document = service.documents().get(documentId=DOCUMENT_ID).execute()
-
+    document = setup()
     print('The title of the document is: {}'.format(document.get('title')))
-    log(f"-  -  -\n{document.get('body')}")
+    for i in document.get('body').get('content'):
+      # intel(i)
+      # print(i.get('paragraph').get('elements')[0].get('textRun').get('content'))
+      # input("[ENTER]")
+      try:
+        content = i.get('paragraph').get('elements')[0].get('textRun').get('content')
+        if content is not None: 
+          print(content)
+          if even(find_str(i.get('paragraph').get('elements')[0].get('textRun').get('content'), '`')):
+            print(replace_string(content, '`', '||||||'))
+
+      except AttributeError as e:
+        print(f"no object: {e}")
+    # log(f"-  -  -\n{document.get('body')}")
+
+def intel(thing):
+  log(f"Size: {len(thing)}\nType: {type(thing)}\n---\n{thing}")
+  print(f"Size: {len(thing)}\nType: {type(thing)}\n---\n{thing}")
 
 
 if __name__ == '__main__':
