@@ -5,8 +5,10 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+import classes
 
-sample_request = {
+
+updateTestStyle_request = {
   'updateTextStyle': {
     'range': {
       'segmentId': None,
@@ -14,12 +16,7 @@ sample_request = {
       'endIndex': None
     },
     'textStyle': {
-      "bold": False,
-      "italic": False,
-      "underline": False,
-      "strikethrough": False,
-      "smallCaps": False,
-      "backgroundColor": {
+      "foregroundColor": {
         'color': {
           'rgbColor': {
             'red': 0.2,
@@ -28,7 +25,7 @@ sample_request = {
           }
         }
       },
-      "foregroundColor": {
+      "backgroundColor": {
         'color': {
           'rgbColor': {
             'red': 0.96,
@@ -36,18 +33,17 @@ sample_request = {
             'blue': 0.96
           }
         }
-        },
-    "fontSize": {
+      },
+      "fontSize": {
         'magnitude': 10,
         'unit': 'PT'
+      },
+      "weightedFontFamily": {
+        'fontFamily': 'Courier New',
+        'weight': 400
+      },
     },
-  "weightedFontFamily": {
-    'fontFamily': 'Courier New OS',
-    'weight': 400
-  },
-  "baselineOffset": 'NONE',
-  "link": None
-    }
+    'fields': 'backgroundColor, foregroundColor, fontSize, weightedFontFamily'
   }
 }
 
@@ -91,16 +87,19 @@ def setup():
     return document
 
 
-def edit_request(startIndex=None, endIndex=None):
-    sample_request.get('updateTextStyle').get('range').update({'startIndex': startIndex})
-    sample_request.get('updateTextStyle').get('range').update({'endIndex': endIndex})
-    wb = sample_request.get('updateTextStyle').get('range')
+def edit_testStyle_request(startIndex=None, endIndex=None):
+    updateTestStyle_request.get('updateTextStyle').get('range').update({'startIndex': startIndex})
+    updateTestStyle_request.get('updateTextStyle').get('range').update({'endIndex': endIndex})
+    wb = updateTestStyle_request.get('updateTextStyle').get('range')
     print(wb)
-    return sample_request
+    return updateTestStyle_request
+
+
+# def edit_updateText
 
 
 def update(request):
     result = service.documents().batchUpdate(
-        documentId=DOCUMENT_ID, body={'requests': [request]}).execute(num_retries=10)
+        documentId=DOCUMENT_ID, body={'requests': request}).execute(num_retries=10)
     return result
 
