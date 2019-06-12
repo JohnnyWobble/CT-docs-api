@@ -1,11 +1,11 @@
 from __future__ import print_function
 
-import setup
 import classes
-  
+
+
 def start():
-  document = classes.Document("1UeorM9adOh8Nds1Z457RRKBZMkh0VZ_kn_jllpkzh7U", ['https://www.googleapis.com/auth/documents'])
-  return document
+    document = classes.Document("1UeorM9adOh8Nds1Z457RRKBZMkh0VZ_kn_jllpkzh7U", ['https://www.googleapis.com/auth/documents'])
+    return document
 
 
 def log(string):
@@ -17,11 +17,11 @@ def main():
     document = start()
     print('The title of the document is: {}'.format(document.get().get('title')))
     while True:
-      backticks = []
-      while backticks == []:
-        document.on_change()
-        backticks = document.find_backticks()
-      print(document.add_code_blocks(backticks))
+        backticks = []
+        while backticks == []:
+            document.on_change()
+            backticks = document.find_backticks()
+        print(document.add_code_blocks(backticks))
 
 
 def intel(thing):
