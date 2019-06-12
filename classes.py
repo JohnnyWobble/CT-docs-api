@@ -32,12 +32,12 @@ class Document:
         # if the timeout is exceded then it rases an error
         past = self.get()
         while timeout != 0:
-            for i in range(10):
+            for i in range(5):
                 current = self.get()
                 if past != current:
                     self.data = current
                     return current
-                time.sleep(0.1)
+                time.sleep(0.15)
             timeout -= 1
         raise TimeoutError
 
@@ -52,16 +52,20 @@ class Document:
         # format [[startIndex, endIndex], ...]
         index_list = []
         for i in self.data.get('body').get('content'):
-            try:
-                content = i.get('paragraph').get('elements')[0].get('textRun').get('content')
-                if content is not None:
-                    if even(find_str(i.get('paragraph').get('elements')[0].get('textRun').get('content'), '`')):
-                        first, second = Document.find_backs(i.get('paragraph').get('elements')[0].get('textRun').get('content'), '`')
-                        startIndex = i.get('startIndex') + first
-                        endIndex = i.get('startIndex') + second
-                        index_list.append([startIndex, endIndex])
-            except AttributeError:
-                continue
+          try:
+            for j in i.get('paragraph').get('elements'):
+              try:
+                  content = j.get('textRun').get('content')
+                  if content is not None:
+                      if even(find_str(j.get('textRun').get('content'), '`')):
+                          first, second = Document.find_backs(j.get('textRun').get('content'), '`')
+                          startIndex = j.get('startIndex') + first
+                          endIndex = j.get('startIndex') + second
+                          index_list.append([startIndex, endIndex])
+              except AttributeError:
+                  continue
+          except AttributeError:
+            continue
         return index_list
 
     @staticmethod
@@ -81,10 +85,8 @@ class Document:
         service.documents().batchUpdate(documentId=self.ID, body={'requests': {'replaceAllText': request_dict.delete_backs}}).execute()
         return result
 
-    def get(self):
+    def start(self):
         global service
-        DOCUMENT_ID = self.ID
-        SCOPES = self.scope
         creds = None
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -98,7 +100,7 @@ class Document:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', SCOPES)
+                    'credentials.json', self.scope)
                 creds = flow.run_local_server()
             # Save the credentials for the next run
             with open('token.pickle', 'wb') as token:
@@ -106,6 +108,11 @@ class Document:
 
         service = build('docs', 'v1', credentials=creds)
         # Retrieve the documents contents from the Docs service.
-        document = service.documents().get(documentId=DOCUMENT_ID).execute()
+        document = service.documents().get(documentId=self.ID).execute()
         self.data = document
         return document
+
+    def get(self):
+        document = service.documents().get(documentId=self.ID).execute()
+        self.data = document
+        return document  

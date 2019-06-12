@@ -4,7 +4,7 @@ import classes
 
 
 def start():
-    document = classes.Document("1UeorM9adOh8Nds1Z457RRKBZMkh0VZ_kn_jllpkzh7U", ['https://www.googleapis.com/auth/documents'])
+    document = classes.Document(input('what is the document ID? '), ['https://www.googleapis.com/auth/documents'])
     return document
 
 
@@ -15,6 +15,8 @@ def log(string):
 
 def main():
     document = start()
+    document.start()
+    # print(document.data)
     print('The title of the document is: {}'.format(document.get().get('title')))
     while True:
         backticks = []
