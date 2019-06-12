@@ -35,8 +35,8 @@ class Document:
             for i in range(10):
                 current = self.get()
                 if past != current:
-                      self.data = current
-                      return current
+                    self.data = current
+                    return current
                 time.sleep(0.1)
             timeout -= 1
         raise TimeoutError
